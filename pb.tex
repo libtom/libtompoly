@@ -1,0 +1,362 @@
+\documentclass[b5paper]{book}
+\usepackage{hyperref}
+\usepackage{makeidx}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{alltt}
+\usepackage{graphicx}
+\usepackage{layout}
+\def\union{\cup}
+\def\intersect{\cap}
+\def\getsrandom{\stackrel{\rm R}{\gets}}
+\def\cross{\times}
+\def\cat{\hspace{0.5em} \| \hspace{0.5em}}
+\def\catn{$\|$}
+\def\divides{\hspace{0.3em} | \hspace{0.3em}}
+\def\nequiv{\not\equiv}
+\def\approx{\raisebox{0.2ex}{\mbox{\small $\sim$}}}
+\def\lcm{{\rm lcm}}
+\def\gcd{{\rm gcd}}
+\def\log{{\rm log}}
+\def\ord{{\rm ord}}
+\def\abs{{\mathit abs}}
+\def\rep{{\mathit rep}}
+\def\mod{{\mathit\ mod\ }}
+\renewcommand{\pmod}[1]{\ ({\rm mod\ }{#1})}
+\newcommand{\floor}[1]{\left\lfloor{#1}\right\rfloor}
+\newcommand{\ceil}[1]{\left\lceil{#1}\right\rceil}
+\def\Or{{\rm\ or\ }}
+\def\And{{\rm\ and\ }}
+\def\iff{\hspace{1em}\Longleftrightarrow\hspace{1em}}
+\def\implies{\Rightarrow}
+\def\undefined{{\rm ``undefined"}}
+\def\Proof{\vspace{1ex}\noindent {\bf Proof:}\hspace{1em}}
+\let\oldphi\phi
+\def\phi{\varphi}
+\def\Pr{{\rm Pr}}
+\newcommand{\str}[1]{{\mathbf{#1}}}
+\def\F{{\mathbb F}}
+\def\N{{\mathbb N}}
+\def\Z{{\mathbb Z}}
+\def\R{{\mathbb R}}
+\def\C{{\mathbb C}}
+\def\Q{{\mathbb Q}}
+\definecolor{DGray}{gray}{0.5}
+\newcommand{\emailaddr}[1]{\mbox{$<${#1}$>$}}
+\def\twiddle{\raisebox{0.3ex}{\mbox{\tiny $\sim$}}}
+\def\gap{\vspace{0.5ex}}
+\makeindex
+\begin{document}
+\frontmatter
+\pagestyle{empty}
+\title{LibTomPoly User Manual \\ v0.01}
+\author{Tom St Denis \\ tomstdenis@iahu.ca}
+\maketitle
+This text and library are  hereby placed in the public domain.  This book has been 
+formatted for B5 [176x250] paper using the \LaTeX{} {\em book} macro package.
+
+\vspace{10cm}
+
+\begin{flushright}Open Source.  Open Academia.  Open Minds.
+
+\mbox{ }
+
+Tom St Denis,
+
+Ontario, Canada
+\end{flushright}
+
+\tableofcontents
+\listoffigures
+\mainmatter
+\pagestyle{headings}
+\chapter{Introduction}
+\section{What is LibTomPoly?}
+LibTomPoly is a public domain open source library to provide polynomial basis arithmetic.  It uses the public domain
+library LibTomMath (not included) for the integer arithmetic and extends the functonality to provide polynomial arithmetic.
+
+Technically speaking the library allows the user to perform arithmetic on elements from the group $GF(p)[x]$ and to 
+a lesser extent (this will change in the future) over $\Z[x]$.  Essentially the math you can do with integers (including
+forming rings and fields) you can do with with polynomials and now you can do with LibTomPoly.
+
+\section{License}
+LibTomPoly is public domain.  Enjoy.
+
+\section{Terminology}
+Throughout this manual and within the library there will be some terminology that not everyone is familiar with.  It is afterall
+weird math.
+
+\begin{figure}[here]
+\begin{center}
+\begin{small}
+\begin{tabular}{|l|l|}
+\hline \textbf{Term} & \textbf{Definition} \\
+\hline monic polynomial & A polynomial where the leading coefficient is a one. \\
+\hline irreducible polynomial & A polynomial that has no factors in a given group.  \\
+                              & For instance, $x^2 + 4$ is irreducible in $\Z[x]$ but not \\
+                              & in $GF(17)[x]$ since $x^2 + 4 = (x+8)(x+9) \mbox{ (mod }17\mbox{)}$.  \\
+\hline primitive polynomial   & An irreducible polynomial which generates all of \\
+                              & elements of a given field (e.g. $GF(p)[x]/v(x)$) \\
+\hline characteristic         & An integer $k$ such that $k \cdot p(x) \equiv 0$  \\
+\hline deg()                  & Functon returns degree of polynomial, e.g. deg($x^6 + x^3 + 1$) = 6 \\
+\hline
+\end{tabular}
+\end{small}
+\end{center}
+\caption{Terminology}
+\end{figure} 
+
+\section{Building the Library}
+The library is not ready for production yet but you can test out the library manually if you want.  To build the library 
+simply type
+
+\begin{alltt}
+make
+\end{alltt}
+
+Which will build ``libtompoly.a''.  As of yet there is no MSVC makefile but one will be released shortly.  To build against
+this library include ``tompoly.h'' and link against ``libtompoly.a''.
+
+To build the included demo type 
+
+\begin{alltt}
+make demo
+\end{alltt}
+
+Which will build ``demo'' in the current directory.  The demo is not interactive and produces results which must be manually
+inspected.
+
+\chapter{Getting Started}
+
+\section{The LibTomMath Connection}
+LibTomPoly is really just an extension of LibTomMath\footnote{\url{http://math.libtomcrypt.org}}.  As such the library has 
+been designed in much the same way as far as argument passing and error handling events are concerned.  The reader is 
+encouraged to become familiar with LibTomMath before diving into LibTomPoly.
+
+\section{The pb\_poly structure}
+A polynomial can characterized by a few variables.  Given the C structure as follows
+
+\begin{alltt}
+typedef struct \{
+   int    used,                  /* number of terms */
+          alloc;                 /* number of terms available (total) */
+   mp_int characteristic,        /* characteristic, zero if not finite */
+          *terms;                /* terms of polynomial */
+\} pb_poly;
+\end{alltt}
+
+\begin{enumerate}
+   \item The \textbf{used} member indicates how many terms of the \textbf{terms} array are used to represent the polynomial.
+   \item The \textbf{alloc} member indicates the size of the \textbf{terms} array.  Also note that even if \textbf{used}
+         is less than \textbf{alloc} the mp\_ints above \textbf{used} in the array must be set to a valid representation 
+         of zero.
+   \item The \textbf{characteristic} member is an mp\_int representing the characteristic of the polynomial.  If the desire is to
+         have a null characteristic (e.g. $\Z[x]$) this element must still be initialized to a valid representation
+         of zero. 
+   \item The \textbf{terms} member is a dynamically sized array of mp\_int values which represent the coefficients for
+         the terms of the polynomial.  They start from least to most significant degree.  E.g. $p(x) = \sum_{i=0}^{used-1} terms_i \cdot x^i$.
+\end{enumerate}
+
+\section{Return Codes}
+The library uses the return codes from LibTomMath.  They are
+
+\index{MP\_OKAY}\index{MP\_YES}\index{MP\_NO}\index{MP\_VAL}\index{MP\_MEM}
+\begin{figure}[here!]
+\begin{center}
+\begin{small}
+\begin{tabular}{|l|l|}
+\hline \textbf{Code} & \textbf{Meaning} \\
+\hline MP\_OKAY & The function succeeded. \\
+\hline MP\_VAL  & The function input was invalid. \\
+\hline MP\_MEM  & Heap memory exhausted. \\
+\hline &\\
+\hline MP\_YES  & Response is yes. \\
+\hline MP\_NO   & Response is no. \\
+\hline
+\end{tabular}
+\end{small}
+\end{center}
+\caption{Return Codes}
+\end{figure}
+
+\section{Function Argument Passing}
+Just like LibTomMath the arguments are meant to be read left to right where the destination is on the right.  Consider
+the following.
+
+\begin{alltt}
+pb_add(a, b, c);   /* c = a + b */
+pb_mul(a, b, c);   /* c = a * b */
+\end{alltt}
+
+Also like LibTomMath input arguments can be specified as output arguments.  Consider.
+
+\begin{alltt}
+pb_mul(a, b, a);   /* a = a * b */
+pb_gcd(a, b, b);   /* b = (a, c) */
+\end{alltt}
+
+However, polynomial math raises another consideration.  The characteristic of the result is taken from the right most
+argument passed to the function.  Not all functions will return an error code if the characteristics of the inputs
+do not match so it's important to keep this in mind.  In general the results are undefined if not all of the polynomials
+have identical characteristics.
+
+\section{Initializing Polynomials}
+In order to use a pb\_poly structure with one of the functions in this library the structure must be initialized.  
+There are three functions provided to initialize pb\_poly structures.
+
+\subsection{Default Initialization}
+\index{pb\_init}
+\begin{alltt}
+int pb_init(pb_poly *a, mp_int *characteristic);
+\end{alltt}
+This will initialize ``a'' with the given ``characteristic'' such that the polynomial represented is a constant zero.  
+The mp\_int characteristic must be a valid initialized mp\_int even if a characteristic of zero is desired.  By default, 
+the polynomial will be initialized so there are ``PB\_TERMS'' terms available.  This will grow automatically as required 
+by the other functions.
+
+\subsection{Initilization of Given Size}
+\index{pb\_init\_size}
+\begin{alltt}
+int pb_init_size(pb_poly *a, mp_int *characteristic, int size);
+\end{alltt}
+This behaves similar to pb\_init() except it will allocate ``size'' terms to initialize instead of ``PB\_TERMS''.  This
+is useful if you happen to know in advance how many terms you want.
+
+\subsection{Initilization of a Copy}
+\index{pb\_init\_copy}
+\begin{alltt}
+int pb_init_copy(pb_poly *a, pb_poly *b);
+\end{alltt}
+
+This will initialize ``a'' so it is a verbatim copy of ``b''.  It will copy the characteristic and all of the terms
+from ``b'' into ``a''.
+
+\subsection{Freeing a Polynomial}
+\index{pb\_clear}
+\begin{alltt}
+int pb_clear(pb_poly *a);
+\end{alltt}
+
+This will free all the memory required by ``a'' and mark it as been freed.  You can repeatedly pb\_clear() the same
+pb\_poly safely.
+
+\chapter{Basic Operations}
+\section{Comparison}
+Comparisions with polynomials is a bit less intuitive then with integers.  Is $x^2 + 3$ greater than $x^2 + x + 4$?  To
+create a rational form of comparison the following comparison codes were designed.
+
+\begin{figure}[here]
+\begin{small}
+\begin{center}
+\begin{tabular}{|l|l|}
+\hline \textbf{Code} & \textbf{Meaning} \\
+\hline PB\_EQ & The polynomials are exactly equal \\
+\hline PB\_DEG\_LT & The left polynomial has a lower degree than the right. \\
+\hline PB\_DEG\_EQ & Both have the same degree. \\
+\hline PB\_DEG\_GT & The left polynomial has a higher degree than the right. \\
+\hline
+\end{tabular}
+\end{center}
+\end{small}
+\caption{Compare Codes}
+\end{figure}
+
+\index{pb\_cmp}
+\begin{alltt}
+int pb_cmp(pb_poly *a, pb_poly *b);
+\end{alltt}
+
+This will compare the polynomial ``a'' to the left of the polynomial ``b''.  It will return one of the four
+codes listed above.  Note that the function does not compare the characteristics.  So if $a \in GF(17)[x]$ and 
+$b \in GF(11)[x]$ were both equal to $x^2 + 3$ they would compare to PB\_EQ.  Whereas $x^3 + 4$
+would compare to PB\_DEG\_LT, $x^1 + 7$ would compare to $PB\_DEG\_GT$ and $x^2 + 7$ would compare to $PB\_DEG\_EQ$\footnote{If the polynomial $a$ were on the left for all three cases.}.
+
+\section{Copying and Swapping}
+\index{pb\_copy}
+\begin{alltt}
+int pb_copy(pb_poly *src, pb_poly *dest);
+\end{alltt}
+This will copy the polynomial from ``src'' to ``dest'' verbatim.
+
+\index{pb\_exch}
+\begin{alltt}
+int pb_exch(pb_poly *a, pb_poly *b);
+\end{alltt}
+This will exchange the contents of ``a'' with ``b''.  
+
+\section{Multiplying and Dividing by $x$}
+\index{pb\_lshd} \index{pb\_rshd}
+\begin{alltt}
+int pb_lshd(pb_poly *a, int i);
+int pb_rshd(pb_poly *a, int i);
+\end{alltt}
+These will multiply (or divide, respectfully) the polynomial ``a'' by $x^i$.  If $i \le 0$ the functions return without
+performing any operation.  
+
+\chapter{Basic Arithmetic}
+\section{Addition, Subtraction and Multiplication}
+\index{pb\_add} \index{pb\_sub}
+\begin{alltt}
+int pb_add(pb_poly *a, pb_poly *b, pb_poly *c);
+int pb_sub(pb_poly *a, pb_poly *b, pb_poly *c);
+int pb_mul(pb_poly *a, pb_poly *b, pb_poly *c);
+\end{alltt}
+
+These will add (subtract or multiply, respectfully) the polynomial ``a'' and polynomial ``b'' and store the result in 
+polynomial ``c''.  The characteristic from  ``c'' is used to calculate the result.  Note that the coefficients of ``c'' 
+will always be positive provided the characteristic of ``c'' is greater than zero.  
+
+Quick examples of usage.
+
+\begin{alltt}
+pb_add(a, b, c);  /* c = a + b */
+pb_sub(b, a, c);  /* c = b - a */
+pb_mul(c, a, a);  /* a = c * a */
+\end{alltt}
+
+\section{Division}
+\index{pb\_div}
+\begin{alltt}
+int pb_div(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d);
+\end{alltt}
+This will divide the polynomial ``a'' by ``b'' and store the quotient in ``c'' and remainder in ``d''.  Either of
+``c'' and ``d'' can be set to \textbf{NULL} to signify their value is not desired.  This is useful if you only want the
+quotient or remainder but not both.  
+
+Since one of the destinations can be \textbf{NULL} the characteristic of the result is taken from ``b''.  The function
+will return an error if the characteristic of ``a'' differs from that of ``b''.  
+
+This function is defined for polynomials in $GF(p)[x]$ only.  A routine pb\_zdiv()\footnote{To be written!} allows the 
+division of polynomials in $\Z[x]$.  
+
+\section{Modular Functions}
+\index{pb\_addmod} \index{pb\_submod} \index{pb\_mulmod}
+\begin{alltt}
+int pb_addmod(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d);
+int pb_submod(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d);
+int pb_mulmod(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d);
+\end{alltt}
+
+These add (subtract or multiply respectfully) the polynomial ``a'' and the polynomial ``b'' modulo the polynomial ``c''
+and store the result in the polynomial ``d''.  
+
+\chapter{Algebraic Functions}
+\section{Greatest Common Divisor}
+\index{pb\_gcd}
+\begin{alltt}
+int pb_gcd(pb_poly *a, pb_poly *b, pb_poly *c);
+\end{alltt}
+This finds the monic greatest common divisor of the two polynomials ``a'' and ``b'' and store the result in ``c''.  The
+operation is only defined over $GF(p)[x]$.  
+
+\section{Modular Inverse}
+\index{pb\_invmod}
+\begin{alltt}
+int pb_invmod(pb_poly *a, pb_poly *b, pb_poly *c);
+\end{alltt}
+This finds the modular inverse of ``a'' modulo ``b'' and stores the result in ``c''.  The operation is only defined over 
+$GF(p)[x]$.  If the operation succeed then the congruent $a(x)b(x) \equiv 1 \mbox{ (mod }c(x)\mbox{)}$ should hold true.
+
+\input{pb.ind}
+
+\end{document}
