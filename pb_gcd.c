@@ -16,10 +16,24 @@ int pb_gcd(pb_poly *a, pb_poly *b, pb_poly *c)
 {
    pb_poly A, B, tmp;
    mp_int  inv;
-   int err, x; 
+   int err;
 
    if (mp_iszero(&(c->characteristic)) == MP_YES) {
       return MP_VAL;
+   }
+
+   /* special cases (one or both are zero) */
+   if (a->used == 0 && b->used == 0) {
+      /* both zero, set to 1 */
+      pb_zero(c);
+      c->used = 1;
+      mp_set(&(c->terms[0]), 1);
+      return MP_OKAY;
+
+   } else if (a->used == 0) {
+      return pb_copy(b, c);
+   } else if (b->used == 0) {
+      return pb_copy(a, c);
    }
 
    if ((err = pb_init(&tmp, &(c->characteristic))) != MP_OKAY) {
@@ -48,26 +62,8 @@ int pb_gcd(pb_poly *a, pb_poly *b, pb_poly *c)
        }
    }
 
-   /* if degree of A is one we set to constant */
-   if (A.used == 1) {
-      mp_set(&(A.terms[0]), 1);
-   }
-
    /* ensure it's monic */
-   if (mp_cmp_d(&(A.terms[A.used-1]), 1) != MP_EQ) {
-      /* work it up... */
-      if ((err = mp_invmod(&(A.terms[A.used-1]), &(c->characteristic), &inv)) != MP_OKAY) {
-         goto __INV;
-      }
-      for (x = 0; x < A.used; x++) {
-          if ((err = mp_mulmod(&(A.terms[x]), &inv, &(c->characteristic), &(A.terms[x]))) != MP_OKAY) { 
-             goto __INV;
-          }
-      }
-   }
-   
-   pb_exch(c, &A);
-   err = MP_OKAY;
+   err = pb_monic(&A, c);
 
 __INV: mp_clear(&inv);
 __B  : pb_clear(&B);

@@ -49,7 +49,7 @@
 \begin{document}
 \frontmatter
 \pagestyle{empty}
-\title{LibTomPoly User Manual \\ v0.01}
+\title{LibTomPoly User Manual \\ v0.02}
 \author{Tom St Denis \\ tomstdenis@iahu.ca}
 \maketitle
 This text and library are  hereby placed in the public domain.  This book has been 
@@ -291,7 +291,12 @@ int pb_lshd(pb_poly *a, int i);
 int pb_rshd(pb_poly *a, int i);
 \end{alltt}
 These will multiply (or divide, respectfully) the polynomial ``a'' by $x^i$.  If $i \le 0$ the functions return without
-performing any operation.  
+performing any operation.  For example,
+
+\begin{alltt}
+pb_lshd(a, 2);  /* a(x) = a(x) * x^2 */
+pb_rshd(a, 7);  /* a(x) = a(x) / x^7 */
+\end{alltt}
 
 \chapter{Basic Arithmetic}
 \section{Addition, Subtraction and Multiplication}
@@ -319,9 +324,14 @@ pb_mul(c, a, a);  /* a = c * a */
 \begin{alltt}
 int pb_div(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d);
 \end{alltt}
-This will divide the polynomial ``a'' by ``b'' and store the quotient in ``c'' and remainder in ``d''.  Either of
-``c'' and ``d'' can be set to \textbf{NULL} to signify their value is not desired.  This is useful if you only want the
-quotient or remainder but not both.  
+This will divide the polynomial ``a'' by ``b'' and store the quotient in ``c'' and remainder in ``d''.  That is
+
+\begin{equation}
+b(x) \cdot c(x) + d(x) = a(x)
+\end{equation}
+
+The value of $deg(d(x))$ is always less than $deg(b(x))$.  Either of ``c'' and ``d'' can be set to \textbf{NULL} to 
+signify their value is not desired.  This is useful if you only want the quotient or remainder but not both.  
 
 Since one of the destinations can be \textbf{NULL} the characteristic of the result is taken from ``b''.  The function
 will return an error if the characteristic of ``a'' differs from that of ``b''.  
@@ -341,6 +351,37 @@ These add (subtract or multiply respectfully) the polynomial ``a'' and the polyn
 and store the result in the polynomial ``d''.  
 
 \chapter{Algebraic Functions}
+
+\section{Monic Reductions}
+\index{pb\_monic}
+\begin{alltt}
+int pb_monic(pb_poly *a, pb_poly *b)
+\end{alltt}
+Makes ``b'' the monic representation of ``a'' by ensuring the most significant coefficient is one.  Only defined
+over $GF(p)[x]$.  Note that this is not a straight copy to ``b'' so you must ensure the characteristic of the two
+are equal before you call the function\footnote{Note that $a == b$ is acceptable as well.}.  Monic polynomials
+are related to their original polynomial through an integer $k$ as follows
+
+\begin{equation}
+a(x) \cdot k^{-1} \equiv b(x)
+\end{equation}
+
+\section{Extended Euclidean Algorithm}
+\index{pb\_exteuclid}
+\begin{alltt}
+int pb_exteuclid(pb_poly *a, pb_poly *b, 
+                 pb_poly *U1, pb_poly *U2, pb_poly *U3);
+\end{alltt}
+
+This will compute the Euclidean algorithm and find values ``U1'', ``U2'', ``U3'' such that 
+
+\begin{equation}
+a(x) \cdot U1(x) + b(x) \cdot U2(x) = U3(x)
+\end{equation}
+
+The value of ``U3'' is reduced to a monic polynomial.  The three destination variables are all optional and can
+be specified as \textbf{NULL} if they are not desired.
+
 \section{Greatest Common Divisor}
 \index{pb\_gcd}
 \begin{alltt}
@@ -355,7 +396,33 @@ operation is only defined over $GF(p)[x]$.
 int pb_invmod(pb_poly *a, pb_poly *b, pb_poly *c);
 \end{alltt}
 This finds the modular inverse of ``a'' modulo ``b'' and stores the result in ``c''.  The operation is only defined over 
-$GF(p)[x]$.  If the operation succeed then the congruent $a(x)b(x) \equiv 1 \mbox{ (mod }c(x)\mbox{)}$ should hold true.
+$GF(p)[x]$.  If the operation succeed then the following congruency should hold true.
+
+\begin{equation}
+a(x)c(x) \equiv 1 \mbox{ (mod }b(x)\mbox{)}
+\end{equation}
+
+\section{Modular Exponentiation}
+\index{pb\_exptmod}
+\begin{alltt}
+int pb_exptmod (pb_poly * G, mp_int * X, pb_poly * P, pb_poly * Y);
+\end{alltt}
+
+This raise ``G'' to the power of ``X'' modulo ``P'' and stores the result in ``Y''. Or as a congruence
+
+\begin{equation}
+Y(x) \equiv G(x)^X \mbox{ (mod }P(x)\mbox{)}
+\end{equation}
+
+Where ``X'' can be negative\footnote{But in that case $G^{-1}(x)$ must exist modulo $P(x)$.} or positive.  This function
+is only defined over $GF(p)[x]$.  
+
+\section{Irreducibility Testing}
+\index{pb\_isirreduc}
+\begin{alltt}
+int pb_isirreduc(pb_poly *a, int *res);
+\end{alltt}
+Sets ``res'' to MP\_YES is ``a'' is irreducible (only for $GF(p)[x]$) otherwise sets ``res'' to MP\_NO.  
 
 \input{pb.ind}
 

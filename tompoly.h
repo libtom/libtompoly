@@ -39,6 +39,7 @@ int pb_init_multi(mp_int *characteristic, pb_poly *pb, ...);
 void pb_clear_multi(pb_poly *mp, ...);
 void pb_clear(pb_poly *a);
 
+int pb_shrink(pb_poly *a);
 int pb_grow(pb_poly *a, int size);
 void pb_clamp(pb_poly *a);
 
@@ -84,10 +85,26 @@ int pb_submod(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d);
 /* d(x) = (a(x) * b(x)) mod c(x) */
 int pb_mulmod(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d);
 
+
+/* mathy stuff */
+
+/* makes b equal to the monic polynomial form of a */
+int pb_monic(pb_poly *a, pb_poly *b);
+
 /* returns the monic GCD of a,b in GF(p^k)[x] */
 int pb_gcd(pb_poly *a, pb_poly *b, pb_poly *c);
 
+/* Extended euclidean algorithm of (a, b) produces  a*u1 + b*u2 = u3  */
+int pb_exteuclid(pb_poly *a, pb_poly *b, pb_poly *U1, pb_poly *U2, pb_poly *U3);
+
+/* finds the inverse of a modulo b and stores it in c such that a*c == 1 mod b */
 int pb_invmod(pb_poly *a, pb_poly *b, pb_poly *c);
+
+/* computes Y == G^X mod P [accepts negative values for X] */
+int pb_exptmod (pb_poly * G, mp_int * X, pb_poly * P, pb_poly * Y);
+
+/* is a(x) irreducible (GF(p)[x] only) */
+int pb_isirreduc(pb_poly *a, int *res);
 
 
 #endif

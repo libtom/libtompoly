@@ -4,19 +4,10 @@ Short term goals [say around June]
    - Stable code, demos to show for it
    - Completed user manual
 
-For v0.02 
-   - Make sure all of the functions are consistent as to where they take the source
-    characteristic from the rightmost argument
-   - Get the pb_invmod to work
-   - Get the core functions [add/sub/mul/div] stable by testing their dependents [grow/init/copy more]
-   - Add a pb_exptmod, pb_isirreducible and various helper functions (e.g. to work with constants)
-   - Add more to the testing demo
-   - Add a MSVC makefile
-   - Add some examples to manual
-
 Down the road
    - Add a Karatsuba multiplier for larger polynomials and add a tuning function
    - write a division algo for Z[x]
    - Some form of trace function?
+   - I/O functions (to_raw, read_raw)
 
 

@@ -1,0 +1,16 @@
+#Makefile for MSVC by Tom St Denis
+CFLAGS = /W3 /Ox /I.
+
+default: tompoly.lib
+
+OBJECTS = pb_init.obj pb_clear.obj pb_init_size.obj pb_grow.obj pb_copy.obj pb_clamp.obj pb_init_copy.obj \
+pb_add.obj pb_sub.obj pb_mul.obj pb_div.obj pb_zero.obj pb_lshd.obj pb_rshd.obj pb_exch.obj pb_mod.obj \
+pb_addmod.obj pb_submod.obj pb_mulmod.obj pb_gcd.obj pb_init_multi.obj pb_clear_multi.obj pb_invmod.obj \
+pb_cmp.obj pb_shrink.obj pb_exteuclid.obj pb_monic.obj pb_exptmod.obj pb_isirreduc.obj
+
+tompoly.lib: $(OBJECTS)
+	lib /out:tompoly.lib $(OBJECTS)
+
+demo: demo/demo.obj tompoly.lib
+	cl demo.obj tompoly.lib tommath.lib
+

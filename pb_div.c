@@ -99,15 +99,14 @@ int pb_div(pb_poly *a, pb_poly *b, pb_poly *c, pb_poly *d)
       /* tmp is now a term of the quotient */
       if ((err = mp_copy(&tmp, &(q.terms[x - b->used + 1]))) != MP_OKAY)                     { goto __TMP2; }
        
-      /* create r(x) = C * x^k */
+      /* create r(x) = C */
       pb_zero(&r);
       if ((err = mp_copy(&tmp, &(r.terms[0]))) != MP_OKAY)                                   { goto __TMP2; }
       r.used = 1;
-      if ((err = pb_lshd(&r, x - b->used + 1)) != MP_OKAY)                                   { goto __TMP2; }
 
-      /* now multiply r(x) by b(x) and subtract from p(x) */
+      /* now multiply r(x) by b(x)*x^k and subtract from p(x) */
       if ((err = pb_mul(b, &r, &r)) != MP_OKAY)                                              { goto __TMP2; }
-
+      if ((err = pb_lshd(&r, x - b->used + 1)) != MP_OKAY)                                   { goto __TMP2; }
       if ((err = pb_sub(&p, &r, &p)) != MP_OKAY)                                             { goto __TMP2; }
    }
 

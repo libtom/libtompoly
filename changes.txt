@@ -1,3 +1,15 @@
+Jan 3rd, 2004
+v0.02 - Update pb_div() to shift r(x) after multplying it wit b(x) to save a bit of time
+      - improved pb_gcd() to handle inputs which are zero
+      - Added pb_shrink()
+      - fixed pb_invmod()
+      - added pb_exteuclid() [back ported that code into LTM... hehehe]
+      - added pb_exptmod()   [this led me to find a bug in LTM!!!]
+      - added pb_monic()
+      - added pb_isirreduc()
+      - Some minor additions to test/documentation
+
+Dec 31st, 2003
 v0.01 ++ thanks goes to Martin Marcel, Greg Rose and Colin Percival for providing some missing knowledge and
          helping me get this release going
       -  Initial release.

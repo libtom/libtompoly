@@ -27,9 +27,12 @@ void draw_poly(pb_poly *a)
 int main(void)
 {
    mp_int chara;
-   pb_poly a,b,c,d,e;
+   pb_poly a,b,c,d,e; 
+   mp_int  aa,bb,cc,dd,ee;
+   int res;
 
    mp_init(&chara);
+   mp_init_multi(&aa,&bb,&cc,&dd,&ee,NULL);
    pb_init_size(&a, &chara, 32);
    pb_init_size(&b, &chara, 32);
    pb_init_size(&c, &chara, 32);
@@ -170,10 +173,10 @@ int main(void)
    printf("a == \n");
    draw_poly(&a);
 
-   /* take inverse of x + 1 */
+   /* take inverse of 2x + 9 */
    pb_zero(&b);
-   mp_set(&(b.terms[1]), 1);
-   mp_set(&(b.terms[0]), 1);
+   mp_set(&(b.terms[1]), 2);
+   mp_set(&(b.terms[0]), 9);
    b.used = 2;
    pb_clamp(&b);
    printf("b == \n");
@@ -187,7 +190,24 @@ int main(void)
    /* test */
    pb_mulmod(&b, &c, &a, &d);
    pb_mul(&b, &c, &e);
-   draw_poly(&d); draw_poly(&e);
+   printf("This should be 1               : "); draw_poly(&d); 
+   printf("This should be equal to k*a + 1: "); draw_poly(&e);
+
+   /* now b has order [dividing] 17^2 - 1 == 288 so b^287 should equal c */
+   printf("exptmod test\n");
+   mp_set(&aa, 287);
+   pb_exptmod(&b, &aa, &a, &d);
+   printf("This should be invmod          : "); draw_poly(&d);
+
+   /* test irreduc */
+   printf("Irreducibility testing\n");
+   pb_isirreduc(&a, &res);
+   printf("This should be 1               : %d\n", res);
+
+   pb_isirreduc(&b, &res);
+   printf("This should be 0               : %d\n", res);
+
+  
 
    return EXIT_SUCCESS;
 }
