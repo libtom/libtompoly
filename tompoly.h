@@ -107,4 +107,9 @@ int pb_exptmod (pb_poly * G, mp_int * X, pb_poly * P, pb_poly * Y);
 int pb_isirreduc(pb_poly *a, int *res);
 
 
+/* I/O */
+int pb_rawsize(pb_poly *a);
+int pb_toraw(pb_poly *a, unsigned char *dst);
+int pb_readraw(pb_poly *a, unsigned char *buf, int len);
+
 #endif

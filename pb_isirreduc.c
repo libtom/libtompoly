@@ -42,8 +42,8 @@ int pb_isirreduc(pb_poly *a, int *res)
        mp_set(&(tmp.terms[1]), 1); tmp.used = 2;
        if ((err = pb_sub(&u, &tmp, &tmp)) != MP_OKAY)                         { goto _ERR; }
 
-       /* d = gcd(u, tmp) */
-       if ((err = pb_gcd(&fm, &tmp, &d)) != MP_OKAY)                           { goto _ERR; }
+       /* d = gcd(fm, tmp) */
+       if ((err = pb_gcd(&fm, &tmp, &d)) != MP_OKAY)                          { goto _ERR; }
        
        /* if d != 1 then reducible */
        if (d.used > 1)                                                        { err = MP_OKAY; goto _ERR; }

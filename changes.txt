@@ -1,3 +1,7 @@
+Jan 25th, 2004
+v0.03 - Added pb_rawsize(), pb_readraw(), pb_toraw()
+      - Fixed bug in pb_monic() where it would only check the first [not leading] coefficient for one
+
 Jan 3rd, 2004
 v0.02 - Update pb_div() to shift r(x) after multplying it wit b(x) to save a bit of time
       - improved pb_gcd() to handle inputs which are zero

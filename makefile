@@ -1,7 +1,7 @@
 #Makefile for GCC by Tom St Denis
 CFLAGS += -I. -Os -Wall -W 
 
-VERSION=0.02
+VERSION=0.03
 
 #default files to install
 LIBNAME=libtompoly.a
@@ -20,7 +20,8 @@ default: libtompoly.a
 OBJECTS = pb_init.o pb_clear.o pb_init_size.o pb_grow.o pb_copy.o pb_clamp.o pb_init_copy.o \
 pb_add.o pb_sub.o pb_mul.o pb_div.o pb_zero.o pb_lshd.o pb_rshd.o pb_exch.o pb_mod.o \
 pb_addmod.o pb_submod.o pb_mulmod.o pb_gcd.o pb_init_multi.o pb_clear_multi.o pb_invmod.o \
-pb_cmp.o pb_shrink.o pb_exteuclid.o pb_monic.o pb_exptmod.o pb_isirreduc.o 
+pb_cmp.o pb_shrink.o pb_exteuclid.o pb_monic.o pb_exptmod.o pb_isirreduc.o pb_rawsize.o \
+pb_toraw.o pb_readraw.o
 
 libtompoly.a: $(OBJECTS)
 	ar $(ARFLAGS) libtompoly.a $(OBJECTS)

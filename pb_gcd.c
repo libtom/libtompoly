@@ -15,7 +15,6 @@
 int pb_gcd(pb_poly *a, pb_poly *b, pb_poly *c)
 {
    pb_poly A, B, tmp;
-   mp_int  inv;
    int err;
 
    if (mp_iszero(&(c->characteristic)) == MP_YES) {
@@ -29,7 +28,6 @@ int pb_gcd(pb_poly *a, pb_poly *b, pb_poly *c)
       c->used = 1;
       mp_set(&(c->terms[0]), 1);
       return MP_OKAY;
-
    } else if (a->used == 0) {
       return pb_copy(b, c);
    } else if (b->used == 0) {
@@ -45,27 +43,23 @@ int pb_gcd(pb_poly *a, pb_poly *b, pb_poly *c)
    if ((err = pb_init_copy(&B, b)) != MP_OKAY) {
       goto __A;
    }
-   if ((err = mp_init(&inv)) != MP_OKAY) {
-      goto __B;
-   }
 
    while (B.used > 0) {
        if ((err = pb_mod(&A, &B, &tmp)) != MP_OKAY) {
-          goto __INV;
+          goto __B;
        }
        /* A = B, B = tmp */
        if ((err = pb_copy(&B, &A)) != MP_OKAY) {
-          goto __INV;
+          goto __B;
        }
        if ((err = pb_copy(&tmp, &B)) != MP_OKAY) {
-          goto __INV;
+          goto __B;
        }
    }
 
    /* ensure it's monic */
    err = pb_monic(&A, c);
 
-__INV: mp_clear(&inv);
 __B  : pb_clear(&B);
 __A  : pb_clear(&A);
 __TMP: pb_clear(&tmp);
