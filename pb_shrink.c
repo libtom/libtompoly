@@ -18,6 +18,12 @@ int pb_shrink(pb_poly *a)
 
    /* first resize the array of terms */
    if (a->used != a->alloc && a->used > 0) {
+      /* free the mp_ints */
+      for (x = a->used; x < a->alloc; x++) {
+          mp_clear(&(a->terms[x]));
+      }
+
+      /* resize the array of pointers */
       tmp = realloc(a->terms, sizeof(mp_int) * a->used);
       if (tmp == NULL) {
          return MP_MEM;

@@ -1,3 +1,8 @@
+May 5th, 2004
+v0.04 - Fixed a bug in pb_monic() which for zero valued inputs could cause a segfault
+      - Daniel Richards (kyhwana@kyhwana.org) found several typos in the manual.
+      - Fixed bug in pb_shrink() that would leak memory 
+
 Jan 25th, 2004
 v0.03 - Added pb_rawsize(), pb_readraw(), pb_toraw()
       - Fixed bug in pb_monic() where it would only check the first [not leading] coefficient for one

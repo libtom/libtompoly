@@ -49,7 +49,7 @@
 \begin{document}
 \frontmatter
 \pagestyle{empty}
-\title{LibTomPoly User Manual \\ v0.03}
+\title{LibTomPoly User Manual \\ v0.04}
 \author{Tom St Denis \\ tomstdenis@iahu.ca}
 \maketitle
 This text and library are  hereby placed in the public domain.  This book has been 
@@ -114,9 +114,13 @@ simply type
 make
 \end{alltt}
 
-Which will build ``libtompoly.a''.  As of yet there is no MSVC makefile but one will be released shortly.  To build against
-this library include ``tompoly.h'' and link against ``libtompoly.a''.
+Which will build ``libtompoly.a''.  To build a Win32 library with MSVC type
 
+\begin{alltt}
+nmake -f makefile.msvc
+\end{alltt}
+
+To build against this library include ``tompoly.h'' and link against ``libtompoly.a'' (or tommath.lib as appropriate).
 To build the included demo type 
 
 \begin{alltt}
@@ -192,7 +196,7 @@ Also like LibTomMath input arguments can be specified as output arguments.  Cons
 
 \begin{alltt}
 pb_mul(a, b, a);   /* a = a * b */
-pb_gcd(a, b, b);   /* b = (a, c) */
+pb_gcd(a, b, b);   /* b = (a, b) */
 \end{alltt}
 
 However, polynomial math raises another consideration.  The characteristic of the result is taken from the right most
@@ -422,7 +426,7 @@ is only defined over $GF(p)[x]$.
 \begin{alltt}
 int pb_isirreduc(pb_poly *a, int *res);
 \end{alltt}
-Sets ``res'' to MP\_YES is ``a'' is irreducible (only for $GF(p)[x]$) otherwise sets ``res'' to MP\_NO.  
+Sets ``res'' to MP\_YES if ``a'' is irreducible (only for $GF(p)[x]$) otherwise sets ``res'' to MP\_NO.  
 
 \input{pb.ind}
 

@@ -22,8 +22,8 @@ int pb_monic(pb_poly *a, pb_poly *b)
       return MP_VAL;
    }
 
-   /* if it's already one just copy */
-   if (mp_cmp_d(&(a->terms[a->used - 1]), 1) == MP_EQ) {
+   /* if it's already monic  just copy */
+   if (a->used == 0 || mp_cmp_d(&(a->terms[a->used - 1]), 1) == MP_EQ) {
       return pb_copy(a, b);
    }
 

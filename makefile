@@ -1,7 +1,7 @@
 #Makefile for GCC by Tom St Denis
 CFLAGS += -I. -Os -Wall -W 
 
-VERSION=0.03
+VERSION=0.04
 
 #default files to install
 LIBNAME=libtompoly.a
@@ -33,10 +33,11 @@ install: libtompoly.a
 	install -g root -o root $(HEADERS) $(DESTDIR)$(INCPATH)
 
 demo: demo/demo.o libtompoly.a
-	gcc demo/demo.o libtompoly.a -ltommath -o demo
+	gcc demo/demo.o libtompoly.a -ltommath -o pbdemo
 
 mandvi: pb.tex
 	echo "hello" > pb.ind
+	latex pb > /dev/null
 	latex pb > /dev/null
 	makeindex pb
 	latex pb > /dev/null
@@ -45,7 +46,7 @@ manual:	mandvi
 	pdflatex pb >/dev/null
 
 clean:
-	rm -f *.o *.a *.obj *.lib *.exe demo/*.o demo/*.obj demo/*.exe
+	rm -f *.o *.a *.obj *.lib *.exe pbdemo demo/*.o demo/*.obj demo/*.exe
 	rm -f *.idx *.ilg *.ind *.lof *.out *.toc *.dvi *.log *.aux
 
 zipup: manual clean
