@@ -19,7 +19,7 @@ HFILES=tompoly.h /sys/include/ape/tommath_class.h /sys/include/ape/tommath_super
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I/sys/include/ape -I/386/include/ape -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
+CFLAGS=-c -I. -I/sys/include/ape -I/$objtype/include/ape -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
 	-D_BSD_EXTENSION 
 
 install:V:
