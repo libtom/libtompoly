@@ -17,7 +17,7 @@ int pb_sub(pb_poly *a, pb_poly *b, pb_poly *c)
    pb_poly *tmp;
 
    /* grow c to be the max size */
-   y = MAX(a->used, b->used);
+   y = PB_MAX(a->used, b->used);
    if (c->alloc < y) {
       if ((err = pb_grow(c, y)) != MP_OKAY) {
          return err;
@@ -28,7 +28,7 @@ int pb_sub(pb_poly *a, pb_poly *b, pb_poly *c)
    characteristic = mp_iszero(&(c->characteristic));
 
    /* sub the terms */
-   z = MIN(a->used, b->used);
+   z = PB_MIN(a->used, b->used);
    for (x = 0; x < z; x++) {
        if ((err = mp_sub(&(a->terms[x]), &(b->terms[x]), &(c->terms[x]))) != MP_OKAY) {
           return err;

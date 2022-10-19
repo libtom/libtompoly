@@ -112,4 +112,13 @@ int pb_rawsize(pb_poly *a);
 int pb_toraw(pb_poly *a, unsigned char *dst);
 int pb_readraw(pb_poly *a, unsigned char *buf, int len);
 
+/* What follows should be in a private header, but it's fine for now like that. */
+
+#ifndef PB_MIN
+#define PB_MIN(x, y) (((x) < (y)) ? (x) : (y))
+#endif
+#ifndef PB_MAX
+#define PB_MAX(x, y) (((x) > (y)) ? (x) : (y))
+#endif
+
 #endif
