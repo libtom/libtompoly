@@ -10,6 +10,7 @@
  * Tom St Denis, tomstdenis@iahu.ca, http://poly.libtomcrypt.org
  */
 #include <tompoly.h>
+#include <stdlib.h>
 
 /* initialize a */
 int pb_init_size(pb_poly *a, mp_int *characteristic, int size)

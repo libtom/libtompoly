@@ -10,6 +10,8 @@
  * Tom St Denis, tomstdenis@iahu.ca, http://poly.libtomcrypt.org
  */
 #include <tompoly.h>
+#include <stdlib.h>
+#include <string.h>
 
 int pb_grow(pb_poly *a, int size)
 {

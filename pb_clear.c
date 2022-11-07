@@ -10,6 +10,7 @@
  * Tom St Denis, tomstdenis@iahu.ca, http://poly.libtomcrypt.org
  */
 #include <tompoly.h>
+#include <stdlib.h>
 
 void pb_clear(pb_poly *a)
 {
